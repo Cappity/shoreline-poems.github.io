@@ -28,8 +28,6 @@
          data-page-title="">
     </div>
 
-    
-    
     <!-- Cusdis Script -->
     <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 
@@ -41,8 +39,6 @@
             return urlParams.get(param);
         }
 
-            var pageTheme = getQueryParameter('page_theme');
-
         // Set Cusdis data attributes based on URL parameters
         document.addEventListener('DOMContentLoaded', function() {
             const pageId = getQueryParameter('page_id');
@@ -52,65 +48,49 @@
             if (pageId) document.getElementById('cusdis_thread').setAttribute('data-page-id', pageId);
             if (pageUrl) document.getElementById('cusdis_thread').setAttribute('data-page-url', pageUrl);
             if (pageTitle) document.getElementById('cusdis_thread').setAttribute('data-page-title', pageTitle);
+            
+            customizeCusdisIframe();
         });
 
-        
-            // Function to inject custom styles into the iframe
+        // Function to inject custom styles into the iframe
         function customizeCusdisIframe() {
-        if (pageTheme == 'dark') {
-          // Select the iframe by its ID or another selector
-          var iframe = document.querySelector('iframe');
-        
-          // Ensure the iframe exists and is accessible
-          if (iframe) {
-            var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        
-            // Check if the iframe document is loaded
-            if (iframeDocument.readyState === 'complete') {
-              // Create a new style element
-              var style = iframeDocument.createElement('style');
-              style.type = 'text/css';
-        
-              // Define your custom CSS
-              var css = `
-                :root {
-                  color-scheme: dark;
-                }
-        
-                body {
-                  background-color: #000 !important;
-                  color: #fff !important;
-                }
-        
-                a {
-                  color: #1e90ff !important;
-                }
-        
-                /* Customize more styles as needed */
-              `;
-        
-              // Insert the CSS into the style element
-              style.appendChild(iframeDocument.createTextNode(css));
-        
-              // Append the style element to the iframe's head
-              iframeDocument.head.appendChild(style);
-            } else {
-              // Wait for the iframe to load before applying styles
-              iframe.onload = function() {
-                customizeCusdisIframe();
-              };
-            }
-          }
-         }
-        }
-    </script><script>
-        // Call the function to apply styles
-        window.addEventListener('DOMContentLoaded', customizeCusdisIframe);
+            const iframe = document.querySelector('iframe');
 
-        window.onload = function() {
-            console.log('Page fully loaded');
-            customizeCusdisIframe();
-        };
+            if (iframe) {
+                const observer = new MutationObserver(() => {
+                    if (iframe.contentDocument) {
+                        const iframeDocument = iframe.contentDocument;
+
+                        // Create a new style element
+                        const style = iframeDocument.createElement('style');
+                        style.type = 'text/css';
+
+                        // Define your custom CSS
+                        const css = `
+                            :root {
+                                color-scheme: dark;
+                            }
+                            body {
+                                background-color: #000 !important;
+                                color: #fff !important;
+                            }
+                            a {
+                                color: #1e90ff !important;
+                            }
+                        `;
+
+                        // Insert the CSS into the style element
+                        style.appendChild(iframeDocument.createTextNode(css));
+
+                        // Append the style element to the iframe's head
+                        iframeDocument.head.appendChild(style);
+                        observer.disconnect(); // Stop observing after styles are applied
+                    }
+                });
+                
+                observer.observe(iframe, { childList: true, subtree: true });
+            }
+        }
     </script>
 </body>
 </html>
